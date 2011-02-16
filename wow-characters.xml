@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<Module>
+  <ModulePrefs title="WoW Characters"
+    title_url="http://targetdummies.blogspot.com"
+    description="Look up character on WoW Armory"
+    author="Peashooter" 
+    author_email="TargetDummiesBlog@google.com"
+    screenshot="https://lh3.googleusercontent.com/_4vzq3_lbLn8/TVlQKOo1uaI/AAAAAAAAAEU/D4cb1SHsvDI/achievement_fall_of_the_lich_king.png"
+    thumbnail="https://lh6.googleusercontent.com/_4vzq3_lbLn8/TVlQRNUkxkI/AAAAAAAAAEc/gX0BGxqKGic/achievement_the_frozen_throne.png">
+    <Require feature="opensocial-0.7"/>
+    <Require feature="google.blog"/>
+    <Require feature="skins"/>
+    <Require feature="views"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+    <div id="content_div"></div>
+    <script type="text/javascript">
+      // get prefs
+      var prefs = new gadgets.Prefs();
+      // Realm defined by user
+      var urlRealm = prefs.getString("myrealm");
+      // Character defined by user
+      var urlCharacter = prefs.getString("mycharacter");
+
+      function makeDOMRequest() {    
+        var params = {};  
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.DOM;
+        var url = "http://www.wowarmory.com/character-sheet.xml?r=Borean%20Tundra&n=Enfermero&rhtml=false";
+
+        // var url = "http://www.wowarmory.com/character-sheet.xml?r=" + urlRealm + ;
+        // url += "&n=" + urlCharacter + "&rhtml=false";  
+
+        gadgets.io.makeRequest(url, response, params);
+      };
+      function response(obj) { 
+        // Start building HTML string that will be displayed in <div>.           
+        // Set the style for the <div>.        
+        var html = "<div>";
+        // obj.data contains a Document DOM element corresponding to the
+        // page that was requested
+        var domdata = obj.data;
+
+        // Display menu title. Use getElementsByTagName() to retrieve the <character> element.
+        // Since there is only one character element in the file,
+        // you can get to it by accessing the item at index "0". 
+        // You can then use getAttribute to get the text associated with the
+        // menu "name" attribute.
+        
+        // Get the Name
+        var charName = domdata.getElementsByTagName("character").item(0).getAttribute("name");
+        // Get the Level
+        var charLevel = domdata.getElementsByTagName("character").item(0).getAttribute("level");
+        // Get the Class
+        var charClass = domdata.getElementsByTagName("character").item(0).getAttribute("class");
+        // Get the Race
+        var charRace= domdata.getElementsByTagName("character").item(0).getAttribute("race");
+        // Get the Faction ID where 0 is Alliance and 1 is Horde
+        var charFaction = domdata.getElementsByTagName("character").item(0).getAttribute("factionId");
+        // Get the Realm Name
+        var charRealm = domdata.getElementsByTagName("character").item(0).getAttribute("realm");
+        
+        // Set style and output the Character Name
+        html +="<div style='text-align:left; text-transform:uppercase;
+        html += title + "</div><br>"; 
+
+        // Append extracted data to the HTML string.
+        // for example:
+        // Enfermero
+        // Human Priest (80) - Borean Tundra
+
+        html += charRace;
+        html += " ";
+        html += charClass;
+        html += " (";
+        html += charLevel;
+        html += ") - ";
+        html += charRealm;
+      } 
+      // Close up div
+      html += "</div>";
+      document.getElementById('content_div').innerHTML = html;
+    };
+    gadgets.util.registerOnLoadHandler(makeDOMRequest);
+    </script>
+  ]]>
+  </Content>
+</Module>
